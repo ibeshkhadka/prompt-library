@@ -8,9 +8,9 @@ import { CopyButton } from "@/components/CopyButton";
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   const prompt = await getPromptBySlug(slug);
-  if (!prompt) return { title: "Prompt not found — Mosaic" };
+  if (!prompt) return { title: "Prompt not found" };
   return {
-    title: `${prompt.title} — Mosaic`,
+    title: `${prompt.title} — Prompt Library`,
     description: prompt.short_description,
   };
 }
@@ -33,7 +33,7 @@ export default async function PromptDetailPage({ params }: { params: Promise<{ s
           <div className="flex items-center justify-between h-16">
             <Link href="/" className="flex items-center gap-2 font-bold text-lg">
               <span className="text-[var(--ink)]/40">←</span>
-              Mosaic
+              Prompt Library
             </Link>
             <Link href="/admin/login" className="rounded-full border-2 border-[var(--ink)] bg-[var(--ink)] text-[var(--cream)] px-4 py-2 text-xs font-black">
               Admin
@@ -119,7 +119,7 @@ export default async function PromptDetailPage({ params }: { params: Promise<{ s
       {/* Footer */}
       <footer className="border-t-2 border-[var(--ink)]/10 py-8 mt-12">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 text-center text-sm text-[var(--ink)]/50">
-          © {new Date().getFullYear()} Mosaic Prompt Library
+          © {new Date().getFullYear()} Prompt Library
         </div>
       </footer>
     </div>

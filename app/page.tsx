@@ -69,7 +69,7 @@ export default async function Home({
       <footer className="border-t-2 border-ink/10 py-8 mt-12">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-sm text-ink/50">
-            © {new Date().getFullYear()} Mosaic Prompt Library. Built with care.
+            © {new Date().getFullYear()} Prompt Library. Built with care.
           </p>
           <div className="flex items-center gap-4">
             <a href="/admin/login" className="text-sm text-ink/50 hover:text-ink">

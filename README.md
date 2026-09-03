@@ -1,4 +1,4 @@
-# Mosaic — The Prompt Library
+# Prompt Library
 
 A production-ready personal Prompt Library web app built with Next.js 15 (App Router), TypeScript, Tailwind CSS, and Supabase.
 

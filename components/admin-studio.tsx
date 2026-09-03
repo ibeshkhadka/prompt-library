@@ -112,7 +112,7 @@ export function AdminStudio({ initialPrompts, categories }: { initialPrompts: Pr
     const blob = new Blob([data], { type: kind === "json" ? "application/json" : "text/csv" });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    link.download = `mosaic-prompts.${kind}`;
+    link.download = `prompts.${kind}`;
     link.click();
     URL.revokeObjectURL(link.href);
   };
@@ -168,7 +168,7 @@ export function AdminStudio({ initialPrompts, categories }: { initialPrompts: Pr
     <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="text-xs font-black uppercase tracking-widest">Mosaic admin</p>
+          <p className="text-xs font-black uppercase tracking-widest">Admin</p>
           <h1 className="display mt-1 text-5xl">Prompt studio</h1>
         </div>
         <div className="flex flex-wrap gap-2">

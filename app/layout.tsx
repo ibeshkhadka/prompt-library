@@ -6,9 +6,9 @@ const geist = Geist({ subsets: ["latin"], variable: "--font-geist", display: "sw
 const geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-mono", display: "swap" });
 
 export const metadata: Metadata = {
-  title: { default: "Mosaic Prompt Library", template: "%s · Mosaic" },
+  title: { default: "Prompt Library", template: "%s · Prompt Library" },
   description: "A curated collection of AI prompts for writing, business, creativity, code, and more. Search, filter, and copy prompts instantly.",
-  openGraph: { title: "Mosaic — The Prompt Library", description: "A curated collection of AI prompts for writing, business, creativity, code, and more." },
+  openGraph: { title: "Prompt Library", description: "A curated collection of AI prompts for writing, business, creativity, code, and more." },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

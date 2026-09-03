@@ -12,11 +12,11 @@ export function Header() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
         <div className="flex items-center justify-between h-16">
           {/* Brand */}
-          <Link href="/" className="flex items-center gap-2 group" aria-label="Mosaic home">
+          <Link href="/" className="flex items-center gap-2 group" aria-label="Prompt Library home">
             <div className="w-8 h-8 rounded-lg bg-[var(--ink)] flex items-center justify-center group-hover:scale-105 transition-transform">
               <Sparkles size={18} className="text-[var(--mint)]" />
             </div>
-            <span className="text-xl font-bold tracking-tight">Mosaic</span>
+            <span className="text-xl font-bold tracking-tight">Prompt Library</span>
           </Link>
 
           {/* Desktop nav */}
