@@ -28,7 +28,7 @@ export default async function PromptDetailPage({ params }: { params: Promise<{ s
   return (
     <div className="min-h-screen bg-[var(--cream)]">
       {/* Header */}
-      <header className="sticky top-0 z-40 bg-[var(--cream)]/95 backdrop-blur-sm border-b-2 border-[var(--ink)]/10">
+      <header className="fixed top-0 left-0 right-0 z-40 bg-[var(--cream)]/95 backdrop-blur-sm border-b-2 border-[var(--ink)]/10">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <div className="flex items-center justify-between h-16">
             <Link href="/" className="flex items-center gap-2 font-bold text-lg">
@@ -42,7 +42,7 @@ export default async function PromptDetailPage({ params }: { params: Promise<{ s
         </div>
       </header>
 
-      <main className="mx-auto max-w-3xl px-4 py-8 sm:px-6 md:py-12">
+      <main className="mx-auto max-w-3xl px-4 pt-20 py-8 sm:px-6 md:py-12">
         {/* Back link */}
         <Link href="/" className="inline-flex items-center gap-2 text-sm text-[var(--ink)]/60 hover:text-[var(--ink)] mb-6">
           <ArrowLeft size={16} />
