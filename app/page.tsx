@@ -44,7 +44,7 @@ export default async function Home({
               </a>
             </div>
             <div className="relative hidden min-h-64 md:block">
-              <div className="absolute right-6 top-4 grid h-44 w-48 rotate-6 place-items-center rounded-3xl border-2 border-ink bg-lavender p-5 text-center shadow-[6px_6px_0_#17251f]">
+              <div className="absolute right-6 top-4 grid h-44 w-48 rotate-6 place-items-center rounded-3xl border-2 border-ink bg-coral p-5 text-center shadow-[6px_6px_0_#17251f]">
                 <span className="display text-2xl leading-tight">
                   Curated<br />prompts.
                 </span>
