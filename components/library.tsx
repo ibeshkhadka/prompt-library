@@ -129,8 +129,8 @@ export function Library({
           </div>
       </div>
 
-      {/* Category filters — full width */}
-      <div className="mt-6 flex items-center justify-center gap-2 overflow-x-auto pb-2 rounded-xl border-2 border-ink bg-lavender p-3">
+      {/* Category filters — compact */}
+      <div className="mx-auto mt-6 inline-flex items-center justify-center gap-2 overflow-x-auto pb-2 rounded-xl border-2 border-ink bg-mint p-3">
         <SlidersHorizontal size={18} className="shrink-0" />
         <button
           onClick={() => changeCategory("")}
