@@ -130,7 +130,8 @@ export function Library({
       </div>
 
       {/* Category filters — compact */}
-      <div className="mx-auto mt-6 inline-flex items-center justify-center gap-2 overflow-x-auto pb-2 rounded-xl border-2 border-ink bg-mint p-3">
+      <div className="mt-6 flex justify-center">
+      <div className="flex items-center justify-center gap-2 overflow-x-auto pb-2 rounded-xl border-2 border-ink bg-mint p-3">
         <SlidersHorizontal size={18} className="shrink-0" />
         <button
           onClick={() => changeCategory("")}
@@ -152,6 +153,7 @@ export function Library({
             </span>
           </button>
         ))}
+      </div>
       </div>
 
       {/* Rest of the library — constrained */}
