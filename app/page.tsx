@@ -20,7 +20,7 @@ export default async function Home({
   return (
     <>
       <Header />
-      <main className="pt-20">
+      <main>
         {/* Hero */}
         <section className="overflow-hidden border-b-2 border-ink bg-mint">
           <div className="mx-auto grid max-w-7xl gap-8 px-4 py-10 sm:px-6 md:grid-cols-[1.2fr_.8fr] md:py-14">
