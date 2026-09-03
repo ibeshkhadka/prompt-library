@@ -38,7 +38,7 @@ export default async function Home({
               </p>
               <a
                 href="#search"
-                className="mt-7 inline-block rounded-full border-2 border-ink bg-ink px-5 py-3 text-sm font-black text-cream shadow-[3px_3px_0_#fff8e8]"
+                className="mt-7 inline-block rounded-full border-2 border-ink bg-ink px-5 py-3 text-sm font-black text-cream"
               >
                 Explore the collection ↓
               </a>
