@@ -80,56 +80,59 @@ export function Library({
   );
 
   return (
-    <section id="browse" className="mx-auto max-w-7xl px-4 pb-20 sm:px-6">
-      {/* Search box */}
+    <>
+      {/* Search box — full width */}
+      <div className="px-4 sm:px-6">
       <div id="search" className="rounded-2xl border-2 border-ink bg-lavender p-4 shadow-[5px_5px_0_#17251f]">
-        <label className="sr-only" htmlFor="prompt-search">
-          Search prompts
-        </label>
-        <div className="flex items-center gap-3 rounded-xl border-2 border-ink bg-paper px-3">
-          <Search aria-hidden size={19} />
-          <input
-            id="prompt-search"
-            value={search}
-            onChange={(e) => changeSearch(e.target.value)}
-            placeholder="Search by topic, task, tool, or tag…"
-            className="h-12 w-full bg-transparent text-base outline-none"
-          />
-          {search && (
-            <button
-              onClick={() => changeSearch("")}
-              aria-label="Clear search"
-              className="text-ink/40 hover:text-ink"
-            >
-              <X size={16} />
-            </button>
-          )}
-        </div>
+          <label className="sr-only" htmlFor="prompt-search">
+            Search prompts
+          </label>
+          <div className="flex items-center gap-3 rounded-xl border-2 border-ink bg-paper px-3">
+            <Search aria-hidden size={19} />
+            <input
+              id="prompt-search"
+              value={search}
+              onChange={(e) => changeSearch(e.target.value)}
+              placeholder="Search by topic, task, tool, or tag…"
+              className="h-12 w-full bg-transparent text-base outline-none"
+            />
+            {search && (
+              <button
+                onClick={() => changeSearch("")}
+                aria-label="Clear search"
+                className="text-ink/40 hover:text-ink"
+              >
+                <X size={16} />
+              </button>
+            )}
+          </div>
 
-        {/* Filter chips */}
-        <div className="mt-3 flex flex-wrap gap-2" aria-label="Prompt type filters">
-          {(
-            [
-              ["all", "All"],
-              ["new", "New"],
-              ["text", "Text"],
-              ["image", "Image"],
-              ["favorites", "Favorites"],
-            ] as [Filter, string][]
-          ).map(([key, label]) => (
-            <button
-              key={key}
-              onClick={() => changeFilter(key)}
-              aria-pressed={filter === key}
-              className="chip bg-paper"
-            >
-              {label}
-            </button>
-          ))}
+          {/* Filter chips */}
+          <div className="mt-3 flex flex-wrap gap-2" aria-label="Prompt type filters">
+            {(
+              [
+                ["all", "All"],
+                ["new", "New"],
+                ["text", "Text"],
+                ["image", "Image"],
+                ["favorites", "Favorites"],
+              ] as [Filter, string][]
+            ).map(([key, label]) => (
+              <button
+                key={key}
+                onClick={() => changeFilter(key)}
+                aria-pressed={filter === key}
+                className="chip bg-paper"
+              >
+                {label}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
-      {/* Category chips */}
+      {/* Rest of the library — constrained */}
+      <section id="browse" className="mx-auto max-w-7xl px-4 pb-20 sm:px-6">
       <div className="mt-6 flex items-center gap-2 overflow-x-auto pb-2">
         <SlidersHorizontal size={18} className="shrink-0" />
         <button
@@ -186,6 +189,7 @@ export function Library({
           </p>
         </div>
       )}
-    </section>
+      </section>
+    </>
   );
 }
