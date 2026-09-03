@@ -107,7 +107,7 @@ export function Library({
           </div>
 
           {/* Filter chips */}
-          <div className="mt-3 flex flex-wrap gap-2" aria-label="Prompt type filters">
+          <div className="mt-3 flex flex-wrap justify-center gap-2" aria-label="Prompt type filters">
             {(
               [
                 ["all", "All"],
