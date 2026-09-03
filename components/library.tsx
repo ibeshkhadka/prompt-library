@@ -81,8 +81,9 @@ export function Library({
 
   return (
     <>
-      {/* Search box — full width */}
-      <div id="search" className="w-fit mx-auto border-2 border-ink bg-lavender p-4 shadow-[5px_5px_0_#17251f]">
+      {/* Search box — full width outer, centered inner */}
+      <div id="search" className="border-2 border-ink bg-lavender p-4 shadow-[5px_5px_0_#17251f]">
+        <div className="w-fit mx-auto">
           <label className="sr-only" htmlFor="prompt-search">
             Search prompts
           </label>
@@ -127,6 +128,7 @@ export function Library({
               </button>
             ))}
           </div>
+        </div>
       </div>
 
       {/* Category filters — compact */}
