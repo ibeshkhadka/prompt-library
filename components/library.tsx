@@ -129,9 +129,8 @@ export function Library({
           </div>
       </div>
 
-      {/* Rest of the library — constrained */}
-      <section id="browse" className="mx-auto max-w-7xl px-4 pb-20 sm:px-6">
-      <div className="mt-6 flex items-center gap-2 overflow-x-auto pb-2 rounded-xl border-2 border-ink bg-lavender p-3">
+      {/* Category filters — full width */}
+      <div className="mt-6 flex items-center justify-center gap-2 overflow-x-auto pb-2 rounded-xl border-2 border-ink bg-lavender p-3">
         <SlidersHorizontal size={18} className="shrink-0" />
         <button
           onClick={() => changeCategory("")}
@@ -155,6 +154,8 @@ export function Library({
         ))}
       </div>
 
+      {/* Rest of the library — constrained */}
+      <section id="browse" className="mx-auto max-w-7xl px-4 pb-20 sm:px-6">
       {/* Results header */}
       <div className="mt-8 flex items-end justify-between gap-5">
         <div>
