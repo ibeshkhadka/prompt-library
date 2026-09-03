@@ -10,7 +10,7 @@ export default {
       },
       colors: {
         ink: "#17251f",
-        cream: "#6e7cf6",
+        cream: "#fff8e8",
         paper: "#fffdf7",
         mint: "#6ee7c1",
         lavender: "#aeb7ff",
