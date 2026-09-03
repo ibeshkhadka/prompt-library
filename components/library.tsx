@@ -87,7 +87,7 @@ export function Library({
           <label className="sr-only" htmlFor="prompt-search">
             Search prompts
           </label>
-          <div className="flex items-center gap-3 rounded-xl border-2 border-ink bg-paper px-3">
+          <div className="flex items-center gap-3 rounded-xl border-2 border-ink bg-[#6e7cf6] px-3">
             <Search aria-hidden size={19} />
             <input
               id="prompt-search"
