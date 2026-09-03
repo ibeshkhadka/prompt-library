@@ -82,7 +82,7 @@ export function Library({
   return (
     <>
       {/* Search box — full width */}
-      <div id="search" className="rounded-2xl border-2 border-ink bg-lavender p-4 shadow-[5px_5px_0_#17251f]">
+      <div id="search" className="border-2 border-ink bg-lavender p-4 shadow-[5px_5px_0_#17251f]">
           <label className="sr-only" htmlFor="prompt-search">
             Search prompts
           </label>
@@ -131,7 +131,7 @@ export function Library({
 
       {/* Rest of the library — constrained */}
       <section id="browse" className="mx-auto max-w-7xl px-4 pb-20 sm:px-6">
-      <div className="mt-6 flex items-center gap-2 overflow-x-auto pb-2">
+      <div className="mt-6 flex items-center gap-2 overflow-x-auto pb-2 rounded-xl border-2 border-ink bg-lavender p-3">
         <SlidersHorizontal size={18} className="shrink-0" />
         <button
           onClick={() => changeCategory("")}
