@@ -82,7 +82,7 @@ export function Library({
   return (
     <>
       {/* Search box — full width outer, centered inner */}
-      <div id="search" className="border-2 border-ink bg-lavender p-4 shadow-[5px_5px_0_#17251f]">
+      <div id="search" className="border-2 border-ink bg-[#6e7cf6] p-4 shadow-[5px_5px_0_#17251f]">
         <div className="w-fit mx-auto">
           <label className="sr-only" htmlFor="prompt-search">
             Search prompts
