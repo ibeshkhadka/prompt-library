@@ -82,7 +82,6 @@ export function Library({
   return (
     <>
       {/* Search box — full width */}
-      <div className="px-4 sm:px-6">
       <div id="search" className="rounded-2xl border-2 border-ink bg-lavender p-4 shadow-[5px_5px_0_#17251f]">
           <label className="sr-only" htmlFor="prompt-search">
             Search prompts
@@ -128,7 +127,6 @@ export function Library({
               </button>
             ))}
           </div>
-        </div>
       </div>
 
       {/* Rest of the library — constrained */}
