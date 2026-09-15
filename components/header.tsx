@@ -1,11 +1,12 @@
 import Link from "next/link";
-import { ArrowRight, Settings, Terminal } from "lucide-react";
+import { ArrowRight, Settings } from "lucide-react";
+import { LogoMark } from "@/components/logo-mark";
 
 export function Header() {
   return <header className="library-header">
     <div className="library-container header-inner">
       <Link href="/" className="library-brand" aria-label="Prompt Library home">
-        <span className="brand-mark"><Terminal size={20} /></span>
+        <span className="brand-mark"><LogoMark size={38} /></span>
         <span><strong>Prompt Library</strong><small>A little inspiration. A better starting point.</small></span>
       </Link>
       <nav className="header-actions" aria-label="Main navigation">

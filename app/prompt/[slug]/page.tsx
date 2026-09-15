@@ -4,6 +4,7 @@ import Link from "next/link";
 import { getPromptBySlug, getPublicPrompts } from "@/lib/prompts";
 import { ArrowLeft, Calendar, Tag, Wrench, FileText, Image, Sparkles, Star } from "lucide-react";
 import { CopyButton } from "@/components/CopyButton";
+import { LogoMark } from "@/components/logo-mark";
 
 export async function generateStaticParams() {
   const prompts = await getPublicPrompts();
@@ -37,7 +38,7 @@ export default async function PromptDetailPage({ params }: { params: Promise<{ s
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <div className="flex items-center justify-between h-16">
             <Link href="/" className="flex items-center gap-2 font-bold text-lg">
-              <span className="text-[var(--ink)]/40">←</span>
+              <LogoMark size={30} />
               Prompt Library
             </Link>
             <Link href="/admin/login" className="rounded-full border-2 border-[var(--ink)] bg-[var(--ink)] text-[var(--cream)] px-4 py-2 text-xs font-black">

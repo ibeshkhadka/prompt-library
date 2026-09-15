@@ -177,7 +177,7 @@ body {
 .library-header { background: #10967f; border-bottom: 2px solid #19191f; }
 .header-inner { height: 80px; display: flex; align-items: center; justify-content: space-between; gap: 20px; padding-inline: 20px; }
 .library-brand { display: flex; align-items: center; gap: 10px; color: #fff7e2; }
-.brand-mark { display: inline-flex; align-items: center; justify-content: center; width: 35px; height: 35px; border-radius: 10px; background: #19191f; color: #fff7e2; flex-shrink: 0; }
+.brand-mark { display: inline-flex; align-items: center; justify-content: center; width: 42px; height: 42px; border-radius: 12px; background: #19191f; color: #fff7e2; flex-shrink: 0; }
 .library-brand strong { display: block; font-size: 18px; line-height: 1.15; font-weight: 850; }
 .library-brand small { display: block; font-size: 11px; opacity: .7; }
 .header-actions { display: flex; align-items: center; gap: 12px; }
@@ -243,7 +243,7 @@ body {
   .header-inner { height: 72px; gap: 8px; }
   .library-brand strong { font-size: 15px; }
   .library-brand small { display: none; }
-  .brand-mark { width: 29px; height: 29px; }
+  .brand-mark { width: 34px; height: 34px; }
   .header-actions { gap: 9px; }
   .search-link { padding: 8px 10px; font-size: 11px; gap: 4px; }
   .search-link svg { width: 12px; }
