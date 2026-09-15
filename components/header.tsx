@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Settings } from "lucide-react";
 import { LogoMark } from "@/components/logo-mark";
 
 export function Header() {
@@ -12,7 +12,7 @@ export function Header() {
       <nav className="header-actions" aria-label="Main navigation">
         <Link href="/#search" className="pink-button search-link">Search prompts <ArrowRight size={16} /></Link>
         <Link href="/admin/login" className="settings-link" aria-label="Open Admin Panel" title="Admin Panel">
-          <LogoMark size={27} />
+          <Settings size={18} />
         </Link>
       </nav>
     </div>
