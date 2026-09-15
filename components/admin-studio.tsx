@@ -449,6 +449,7 @@ function Editor({
           >
             <option value="text">Text</option>
             <option value="image">Image</option>
+            <option value="video">Video</option>
           </select>
         </label>
 

@@ -64,7 +64,7 @@ export default async function PromptDetailPage({ params }: { params: Promise<{ s
             )}
             <span className="rounded-full border border-[var(--ink)] px-2 py-1 text-[10px] font-black uppercase tracking-wider flex items-center gap-1">
               {prompt.prompt_type === "image" ? <Image size={12} /> : <FileText size={12} />}
-              {prompt.prompt_type === "image" ? "Image" : "Text"}
+              {prompt.prompt_type === "image" ? "Image" : prompt.prompt_type === "video" ? "Video" : "Text"}
             </span>
             {prompt.is_featured && <span className="rounded-full border border-[var(--ink)] bg-[var(--sun)] px-2 py-1 text-[10px] font-black uppercase tracking-wider flex items-center gap-1"><Star size={12} /> Featured</span>}
             {prompt.is_new && <span className="rounded-full border border-[var(--ink)] bg-[var(--mint)] px-2 py-1 text-[10px] font-black uppercase tracking-wider flex items-center gap-1"><Sparkles size={12} /> New</span>}

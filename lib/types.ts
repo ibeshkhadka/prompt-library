@@ -1,4 +1,4 @@
-export type PromptType = "text" | "image";
+export type PromptType = "text" | "image" | "video";
 export type Category = { id: string; name: string; slug: string; color: string };
 export type Prompt = {
   id: string; title: string; slug: string; short_description: string; content: string;

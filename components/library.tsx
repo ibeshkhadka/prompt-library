@@ -5,13 +5,13 @@ import { Search, X } from "lucide-react";
 import type { Category, Prompt } from "@/lib/types";
 import { PromptCard } from "@/components/prompt-card";
 
-export type Filter = "all" | "instagram" | "youtube" | "new" | "text" | "image" | "favorites";
+export type Filter = "all" | "new" | "text" | "image" | "video" | "favorites";
 const PAGE_SIZE = 24;
-const FILTERS: [Filter, string][] = [["all", "All"], ["instagram", "◆ Instagram"], ["youtube", "▶ YouTube"], ["new", "★ New"], ["text", "Text"], ["image", "Image"], ["favorites", "♡ Saved"]];
+const FILTERS: [Filter, string][] = [["all", "All"], ["new", "★ New"], ["text", "Text"], ["image", "Image"], ["video", "Video"], ["favorites", "♡ Saved"]];
 const matchesFilter = (p: Prompt, filter: Filter, favorites: string[]) => filter === "all" ||
   (filter === "new" && p.is_new) || filter === p.prompt_type ||
   (filter === "favorites" && favorites.includes(p.id)) ||
-  ((filter === "instagram" || filter === "youtube") && p.tags.some(tag => tag.toLowerCase() === filter));
+  (filter === "video" && p.prompt_type === "video");
 
 export function Library({ prompts, categories, initialSearch = "", initialFilter = "all", initialCategory = "" }: {
   prompts: Prompt[]; categories: Category[]; initialSearch?: string; initialFilter?: Filter; initialCategory?: string;

@@ -29,7 +29,7 @@ const exportedPrompts: Prompt[] = (supabaseRows as Record<string, unknown>[]).ma
   short_description: String(row.short_description), content: String(row.content),
   category: sampleCategories.find((category) => category.id === supabaseCategoryMap[String(row.category_id)]) ?? null,
   tags: parseArray(row.tags), tools: parseArray(row.tools),
-  prompt_type: row.prompt_type === "image" ? "image" : "text",
+  prompt_type: row.prompt_type === "image" ? "image" : row.prompt_type === "video" ? "video" : "text",
   is_featured: Boolean(row.is_featured), is_new: Boolean(row.is_new),
   is_public: Boolean(row.is_public), is_archived: Boolean(row.is_archived),
   updated_at: String(row.updated_at), created_at: String(row.created_at)
