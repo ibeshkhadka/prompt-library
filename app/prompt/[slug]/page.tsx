@@ -1,9 +1,14 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { getPromptBySlug } from "@/lib/prompts";
+import { getPromptBySlug, getPublicPrompts } from "@/lib/prompts";
 import { ArrowLeft, Calendar, Tag, Wrench, FileText, Image, Sparkles, Star } from "lucide-react";
 import { CopyButton } from "@/components/CopyButton";
+
+export async function generateStaticParams() {
+  const prompts = await getPublicPrompts();
+  return prompts.map((prompt) => ({ slug: prompt.slug }));
+}
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;

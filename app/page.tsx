@@ -2,19 +2,10 @@ import { Header } from "@/components/header";
 import { Library } from "@/components/library";
 import { getCategories, getPublicPrompts } from "@/lib/prompts";
 
-export default async function Home({
-  searchParams,
-}: {
-  searchParams: Promise<{
-    q?: string;
-    filter?: "all" | "new" | "text" | "image" | "favorites";
-    category?: string;
-  }>;
-}) {
-  const [prompts, categories, params] = await Promise.all([
+export default async function Home() {
+  const [prompts, categories] = await Promise.all([
     getPublicPrompts(),
     getCategories(),
-    searchParams,
   ]);
 
   return (
@@ -63,9 +54,6 @@ export default async function Home({
         <Library
           prompts={prompts}
           categories={categories}
-          initialSearch={params.q}
-          initialFilter={params.filter}
-          initialCategory={params.category}
         />
       </main>
 
