@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Download, Upload, Plus, Copy, Trash2, Eye, Archive, X } from "lucide-react";
+import { Download, Upload, Plus, Pencil, Trash2, Eye, Archive, X } from "lucide-react";
 import type { Category, Prompt } from "@/lib/types";
 
 const blank = (categories: Category[]): Partial<Prompt> => ({
@@ -191,7 +191,7 @@ export function AdminStudio({ initialPrompts, categories }: { initialPrompts: Pr
             onClick={() => setSelected(blank(categories))}
             className="rounded-full border-2 border-ink bg-mint px-4 py-2 text-sm font-black"
           >
-            <Plus size={16} className="mr-1 inline" /> New prompt
+            <Plus size={16} className="mr-1 inline" /> Add new prompt
           </button>
         </div>
       </div>
@@ -222,7 +222,7 @@ export function AdminStudio({ initialPrompts, categories }: { initialPrompts: Pr
             onChange={(e) => setQuery(e.target.value)}
           />
           <p className="mt-4 text-xs font-black uppercase tracking-wider">
-            {filtered.length} prompts
+            Manage prompts · {filtered.length} total
           </p>
           <div className="mt-3 max-h-[65vh] space-y-2 overflow-auto pr-1">
             {filtered.map((item) => (
@@ -238,20 +238,20 @@ export function AdminStudio({ initialPrompts, categories }: { initialPrompts: Pr
                       {item.is_public ? "Public" : "Private"}
                     </span>
                   </button>
-                  <div className="flex gap-1">
+                  <div className="flex flex-wrap justify-end gap-1">
                     <button
                       onClick={() => setSelected(item)}
                       aria-label={`Edit ${item.title}`}
-                      className="rounded-full border-2 border-ink p-1.5 hover:bg-mint"
+                      className="inline-flex items-center gap-1 rounded-full border-2 border-ink px-2.5 py-1.5 text-xs font-bold hover:bg-mint"
                     >
-                      <Copy size={14} />
+                      <Pencil size={13} /> Edit
                     </button>
                     <button
                       onClick={() => setConfirm(item.id)}
-                      aria-label={`Delete ${item.title}`}
-                      className="rounded-full border-2 border-ink p-1.5 hover:bg-coral"
+                      aria-label={`Remove ${item.title}`}
+                      className="inline-flex items-center gap-1 rounded-full border-2 border-ink px-2.5 py-1.5 text-xs font-bold hover:bg-coral"
                     >
-                      <Trash2 size={14} />
+                      <Trash2 size={13} /> Remove
                     </button>
                   </div>
                 </div>
@@ -278,7 +278,13 @@ export function AdminStudio({ initialPrompts, categories }: { initialPrompts: Pr
         ) : (
           <section className="rounded-2xl border-2 border-dashed border-ink/30 bg-cream p-5 flex items-center justify-center min-h-[400px]">
             <div className="text-center">
-              <p className="text-ink/40 text-sm">Select a prompt to edit, or create a new one.</p>
+              <p className="text-ink/50 text-sm">Select a prompt to edit, or add a new one.</p>
+              <button
+                onClick={() => setSelected(blank(categories))}
+                className="mt-4 rounded-full border-2 border-ink bg-mint px-4 py-2 text-sm font-black"
+              >
+                <Plus size={16} className="mr-1 inline" /> Add new prompt
+              </button>
             </div>
           </section>
         )}
@@ -288,12 +294,12 @@ export function AdminStudio({ initialPrompts, categories }: { initialPrompts: Pr
       {confirm && (
         <div className="fixed inset-0 z-50 grid place-items-center bg-ink/55 p-4">
           <div className="rounded-2xl border-2 border-ink bg-cream p-6 max-w-sm w-full shadow-[8px_8px_0_#17251f]">
-            <h2 className="text-xl font-bold mb-2">Delete prompt?</h2>
+            <h2 className="text-xl font-bold mb-2">Remove prompt?</h2>
             <p className="text-sm text-ink/70 mb-4">This action cannot be undone.</p>
             <div className="flex gap-2 justify-end">
               <button onClick={() => setConfirm(null)} className="chip">Cancel</button>
               <button onClick={() => remove(confirm)} className="rounded-full border-2 border-ink bg-coral px-4 py-2 text-xs font-black">
-                Delete
+                Remove prompt
               </button>
             </div>
           </div>

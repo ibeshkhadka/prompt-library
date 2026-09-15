@@ -111,7 +111,7 @@ export function PromptDialog({ prompt, onClose }: { prompt: Prompt; onClose: () 
           <div className="flex flex-wrap gap-1.5">
             {prompt.tags.map((tag) => (
               <span key={tag} className="chip">
-                #{tag}
+                {tag}
               </span>
             ))}
           </div>

@@ -11,7 +11,10 @@ export function Header() {
       </Link>
       <nav className="header-actions" aria-label="Main navigation">
         <Link href="/#search" className="pink-button search-link">Search prompts <ArrowRight size={16} /></Link>
-        <Link href="/admin/login" className="settings-link" aria-label="Admin settings"><Settings size={18} /></Link>
+        <Link href="/admin/login" className="settings-link" aria-label="Open Admin Panel" title="Admin Panel">
+          <Settings size={18} />
+          <span>Admin Panel</span>
+        </Link>
       </nav>
     </div>
   </header>;

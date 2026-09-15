@@ -108,7 +108,7 @@ export default async function PromptDetailPage({ params }: { params: Promise<{ s
               </h3>
               <div className="flex flex-wrap gap-2">
                 {prompt.tags.map((tag) => (
-                  <span key={tag} className="text-sm text-[var(--ink)]/60">#{tag}</span>
+                  <span key={tag} className="rounded-full border border-[var(--ink)]/20 px-2.5 py-1 text-sm text-[var(--ink)]/60">{tag}</span>
                 ))}
               </div>
             </div>
