@@ -22,7 +22,7 @@ export default async function Home({
       <Header />
       <main>
         {/* Hero */}
-        <section className="overflow-hidden border-b-2 border-ink bg-mint">
+        <section className="dot-grid overflow-hidden border-b-2 border-ink">
           <div className="mx-auto grid max-w-7xl gap-8 px-4 py-10 sm:px-6 md:grid-cols-[1.2fr_.8fr] md:py-14">
             <div>
               <p className="inline-block rounded-full border-2 border-ink bg-cream px-3 py-1 text-xs font-black uppercase tracking-widest">

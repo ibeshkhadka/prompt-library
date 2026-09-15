@@ -159,7 +159,7 @@ export function Library({
       </div>
 
       {/* Rest of the library — constrained */}
-      <section id="browse" className="mx-auto max-w-7xl px-4 pb-20 sm:px-6">
+      <section id="browse" className="mx-auto max-w-7xl bg-[var(--lavender)] px-4 pb-20 sm:px-6">
       {/* Results header */}
       <div className="mt-8 flex items-end justify-between gap-5">
         <div>
