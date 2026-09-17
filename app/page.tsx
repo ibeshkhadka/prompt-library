@@ -1,87 +1,17 @@
 import { Header } from "@/components/header";
 import { Library } from "@/components/library";
 import { getCategories, getPublicPrompts } from "@/lib/prompts";
+import Link from "next/link";
+import { LogoMark } from "@/components/logo-mark";
 
-export default async function Home({
-  searchParams,
-}: {
-  searchParams: Promise<{
-    q?: string;
-    filter?: "all" | "new" | "text" | "image" | "favorites";
-    category?: string;
-  }>;
-}) {
-  const [prompts, categories, params] = await Promise.all([
-    getPublicPrompts(),
-    getCategories(),
-    searchParams,
-  ]);
-
-  return (
-    <>
-      <Header />
-      <main>
-        {/* Hero */}
-        <section className="overflow-hidden border-b-2 border-ink bg-mint">
-          <div className="mx-auto grid max-w-7xl gap-8 px-4 py-10 sm:px-6 md:grid-cols-[1.2fr_.8fr] md:py-14">
-            <div>
-              <p className="inline-block rounded-full border-2 border-ink bg-cream px-3 py-1 text-xs font-black uppercase tracking-widest">
-                A practical collection for curious minds
-              </p>
-              <h1 className="display mt-5 max-w-3xl text-6xl leading-[.86] sm:text-8xl">
-                The Prompt
-                <br />
-                <em>Library</em>
-              </h1>
-              <p className="mt-6 max-w-lg text-base font-medium leading-6">
-                A bright little home for the prompts that help you make clearer work, bolder ideas, and fewer blank-page faces.
-              </p>
-              <a
-                href="#search"
-                className="mt-7 inline-block rounded-full border-2 border-ink bg-ink px-5 py-3 text-sm font-black text-cream"
-              >
-                Explore the collection ↓
-              </a>
-            </div>
-            <div className="relative hidden min-h-64 md:block">
-              <div className="absolute right-6 top-4 grid h-44 w-48 rotate-6 place-items-center rounded-3xl border-2 border-ink bg-coral p-5 text-center shadow-[6px_6px_0_#17251f]">
-                <span className="display text-2xl leading-tight">
-                  Curated<br />prompts.
-                </span>
-              </div>
-              <div className="absolute bottom-1 left-4 grid h-48 w-52 -rotate-6 place-items-center rounded-3xl border-2 border-ink bg-lavender p-5 text-center shadow-[6px_6px_0_#17251f]">
-                <span className="display text-4xl leading-none">
-                  Useful ideas,
-                  <br /> well filed.
-                </span>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Library */}
-        <Library
-          prompts={prompts}
-          categories={categories}
-          initialSearch={params.q}
-          initialFilter={params.filter}
-          initialCategory={params.category}
-        />
-      </main>
-
-      {/* Footer */}
-      <footer className="border-t-2 border-ink/10 py-8 mt-12">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-sm text-ink/50">
-            © {new Date().getFullYear()} Prompt Library. Built with care.
-          </p>
-          <div className="flex items-center gap-4">
-            <a href="/admin/login" className="text-sm text-ink/50 hover:text-ink">
-              Admin
-            </a>
-          </div>
-        </div>
-      </footer>
-    </>
-  );
+export default async function Home() {
+  const [prompts, categories] = await Promise.all([getPublicPrompts(), getCategories()]);
+  return <div className="library-page">
+    <Header />
+    <main><Library prompts={prompts} categories={categories} /></main>
+    <footer className="library-footer"><div className="library-container">
+      <Link href="/" aria-label="Prompt Library home" className="brand-mark"><LogoMark size={30} /></Link>
+      <p>New inspiration starts here. Check back often.</p>
+    </div></footer>
+  </div>;
 }

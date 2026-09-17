@@ -2,6 +2,10 @@
 
 A production-ready personal Prompt Library web app built with Next.js 15 (App Router), TypeScript, Tailwind CSS, and Supabase.
 
+## About
+
+Prompt Library is a bright, searchable home for reusable AI prompts across writing, business, creativity, code, and more. Browse the deployed public library at [ibeshkhadka.github.io/prompt-library](https://ibeshkhadka.github.io/prompt-library/).
+
 ## Features
 
 - **Public library** (`/`) — Browse, search, filter, and copy prompts

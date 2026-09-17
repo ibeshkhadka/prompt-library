@@ -1,8 +1,10 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Download, Upload, Plus, Copy, Trash2, Eye, Archive, X } from "lucide-react";
+import { Download, Upload, Plus, Pencil, Trash2, LogOut, X } from "lucide-react";
 import type { Category, Prompt } from "@/lib/types";
+import { createClient } from "@/lib/supabase/client";
+import { normalizePrompt } from "@/lib/normalize-prompt";
 
 const blank = (categories: Category[]): Partial<Prompt> => ({
   title: "",
@@ -10,7 +12,6 @@ const blank = (categories: Category[]): Partial<Prompt> => ({
   short_description: "",
   content: "",
   category: categories[0] ?? null,
-  tags: [],
   tools: [],
   prompt_type: "text",
   is_featured: false,
@@ -23,7 +24,8 @@ function csvEscape(value: unknown) {
   return `"${String(value ?? "").replaceAll('"', '""')}"`;
 }
 
-export function AdminStudio({ initialPrompts, categories }: { initialPrompts: Prompt[]; categories: Category[] }) {
+export function AdminStudio({ initialPrompts, categories, onSignOut }: { initialPrompts: Prompt[]; categories: Category[]; onSignOut: () => void }) {
+  const supabase = useMemo(() => createClient(), []);
   const [prompts, setPrompts] = useState(initialPrompts);
   const [selected, setSelected] = useState<Partial<Prompt> | null>(null);
   const [query, setQuery] = useState("");
@@ -34,7 +36,7 @@ export function AdminStudio({ initialPrompts, categories }: { initialPrompts: Pr
   const filtered = useMemo(
     () =>
       prompts.filter((p) =>
-        `${p.title} ${p.short_description} ${p.tags.join(" ")}`
+        `${p.title} ${p.short_description}`
           .toLowerCase()
           .includes(query.toLowerCase())
       ),
@@ -43,24 +45,28 @@ export function AdminStudio({ initialPrompts, categories }: { initialPrompts: Pr
 
   const save = async () => {
     if (!selected?.title || !selected.content) return setNotice("A title and full prompt are required.");
+    if (!supabase) return setNotice("The admin connection is not configured.");
     setSaving(true);
-    const payload = { ...selected, category_id: selected.category?.id ?? null };
-    const response = await fetch("/api/prompts", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-    const json = await response.json();
+    const payload = {
+      title: selected.title.trim(),
+      slug: (selected.slug || selected.title).trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, ""),
+      short_description: selected.short_description ?? "",
+      content: selected.content,
+      category_id: selected.category?.id ?? null,
+      tools: selected.tools ?? [],
+      prompt_type: selected.prompt_type ?? "text",
+      is_featured: selected.is_featured ?? false,
+      is_new: selected.is_new ?? false,
+      is_public: selected.is_public ?? false,
+      is_archived: selected.is_archived ?? false,
+    };
+    const result = selected.id
+      ? await supabase.from("prompts").update(payload).eq("id", selected.id).select("*, categories(*)").single()
+      : await supabase.from("prompts").insert(payload).select("*, categories(*)").single();
     setSaving(false);
-    if (!response.ok) return setNotice(json.error ?? "Could not save prompt.");
+    if (result.error || !result.data) return setNotice(result.error?.message ?? "Could not save prompt.");
 
-    const category = categories.find((c) => c.id === json.category_id) ?? selected.category ?? null;
-    const fresh = {
-      ...json,
-      category,
-      tags: json.tags ?? [],
-      tools: json.tools ?? [],
-    } as Prompt;
+    const fresh = normalizePrompt(result.data as Record<string, unknown>);
 
     setPrompts((items) =>
       selected.id
@@ -72,16 +78,13 @@ export function AdminStudio({ initialPrompts, categories }: { initialPrompts: Pr
   };
 
   const remove = async (id: string) => {
-    const response = await fetch("/api/prompts", {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id }),
-    });
-    if (response.ok) {
+    if (!supabase) return setNotice("The admin connection is not configured.");
+    const { error } = await supabase.from("prompts").delete().eq("id", id);
+    if (!error) {
       setPrompts((items) => items.filter((p) => p.id !== id));
-      setNotice("Prompt deleted.");
+      setNotice("Prompt removed from the library.");
     } else {
-      setNotice("Could not delete prompt.");
+      setNotice(error.message || "Could not remove prompt.");
     }
     setConfirm(null);
   };
@@ -89,9 +92,9 @@ export function AdminStudio({ initialPrompts, categories }: { initialPrompts: Pr
   const exportData = (kind: "json" | "csv") => {
     const data =
       kind === "json"
-        ? JSON.stringify(prompts, null, 2)
+        ? JSON.stringify(prompts.map(({ tags: _tags, ...prompt }) => prompt), null, 2)
         : [
-            "title,slug,description,content,category,tags,tools,type,public",
+            "title,slug,description,content,category,tools,type,public",
             ...prompts.map((p) =>
               [
                 p.title,
@@ -99,7 +102,6 @@ export function AdminStudio({ initialPrompts, categories }: { initialPrompts: Pr
                 p.short_description,
                 p.content,
                 p.category?.slug,
-                p.tags.join("|"),
                 p.tools.join("|"),
                 p.prompt_type,
                 p.is_public,
@@ -118,6 +120,7 @@ export function AdminStudio({ initialPrompts, categories }: { initialPrompts: Pr
   };
 
   const importFile = async (file: File) => {
+    if (!supabase) return setNotice("The admin connection is not configured.");
     try {
       const text = await file.text();
       const rows: Partial<Prompt>[] = file.name.endsWith(".json")
@@ -139,24 +142,28 @@ export function AdminStudio({ initialPrompts, categories }: { initialPrompts: Pr
                 short_description: values[2],
                 content: values[3],
                 category: categories.find((c) => c.slug === values[4]) ?? null,
-                tags: values[5]?.split("|").filter(Boolean),
-                tools: values[6]?.split("|").filter(Boolean),
-                prompt_type: values[7] === "image" ? "image" : "text",
-                is_public: values[8] === "true",
+                tools: values[5]?.split("|").filter(Boolean),
+                prompt_type: values[6] === "image" ? "image" : values[6] === "video" ? "video" : "text",
+                is_public: values[7] === "true",
               };
             });
 
       for (const row of rows) {
-        const res = await fetch("/api/prompts", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            ...blank(categories),
-            ...row,
-            category_id: row.category?.id ?? null,
-          }),
+        const defaults = blank(categories);
+        const { error } = await supabase.from("prompts").insert({
+          title: row.title,
+          slug: row.slug,
+          short_description: row.short_description ?? "",
+          content: row.content,
+          category_id: row.category?.id ?? defaults.category?.id ?? null,
+          tools: row.tools ?? defaults.tools,
+          prompt_type: row.prompt_type ?? defaults.prompt_type,
+          is_featured: row.is_featured ?? defaults.is_featured,
+          is_new: row.is_new ?? defaults.is_new,
+          is_public: row.is_public ?? defaults.is_public,
+          is_archived: row.is_archived ?? defaults.is_archived,
         });
-        if (!res.ok) throw new Error();
+        if (error) throw error;
       }
       location.reload();
     } catch {
@@ -187,11 +194,14 @@ export function AdminStudio({ initialPrompts, categories }: { initialPrompts: Pr
               onChange={(e) => e.target.files?.[0] && importFile(e.target.files[0])}
             />
           </label>
+          <button onClick={onSignOut} className="chip bg-paper">
+            <LogOut size={14} className="mr-1 inline" /> Sign out
+          </button>
           <button
             onClick={() => setSelected(blank(categories))}
             className="rounded-full border-2 border-ink bg-mint px-4 py-2 text-sm font-black"
           >
-            <Plus size={16} className="mr-1 inline" /> New prompt
+            <Plus size={16} className="mr-1 inline" /> Add new prompt
           </button>
         </div>
       </div>
@@ -222,7 +232,7 @@ export function AdminStudio({ initialPrompts, categories }: { initialPrompts: Pr
             onChange={(e) => setQuery(e.target.value)}
           />
           <p className="mt-4 text-xs font-black uppercase tracking-wider">
-            {filtered.length} prompts
+            Manage prompts · {filtered.length} total
           </p>
           <div className="mt-3 max-h-[65vh] space-y-2 overflow-auto pr-1">
             {filtered.map((item) => (
@@ -238,20 +248,20 @@ export function AdminStudio({ initialPrompts, categories }: { initialPrompts: Pr
                       {item.is_public ? "Public" : "Private"}
                     </span>
                   </button>
-                  <div className="flex gap-1">
+                  <div className="flex flex-wrap justify-end gap-1">
                     <button
                       onClick={() => setSelected(item)}
                       aria-label={`Edit ${item.title}`}
-                      className="rounded-full border-2 border-ink p-1.5 hover:bg-mint"
+                      className="inline-flex items-center gap-1 rounded-full border-2 border-ink px-2.5 py-1.5 text-xs font-bold hover:bg-mint"
                     >
-                      <Copy size={14} />
+                      <Pencil size={13} /> Edit
                     </button>
                     <button
                       onClick={() => setConfirm(item.id)}
-                      aria-label={`Delete ${item.title}`}
-                      className="rounded-full border-2 border-ink p-1.5 hover:bg-coral"
+                      aria-label={`Remove ${item.title}`}
+                      className="inline-flex items-center gap-1 rounded-full border-2 border-ink px-2.5 py-1.5 text-xs font-bold hover:bg-coral"
                     >
-                      <Trash2 size={14} />
+                      <Trash2 size={13} /> Remove
                     </button>
                   </div>
                 </div>
@@ -278,7 +288,13 @@ export function AdminStudio({ initialPrompts, categories }: { initialPrompts: Pr
         ) : (
           <section className="rounded-2xl border-2 border-dashed border-ink/30 bg-cream p-5 flex items-center justify-center min-h-[400px]">
             <div className="text-center">
-              <p className="text-ink/40 text-sm">Select a prompt to edit, or create a new one.</p>
+              <p className="text-ink/50 text-sm">Select a prompt to edit, or add a new one.</p>
+              <button
+                onClick={() => setSelected(blank(categories))}
+                className="mt-4 rounded-full border-2 border-ink bg-mint px-4 py-2 text-sm font-black"
+              >
+                <Plus size={16} className="mr-1 inline" /> Add new prompt
+              </button>
             </div>
           </section>
         )}
@@ -288,12 +304,12 @@ export function AdminStudio({ initialPrompts, categories }: { initialPrompts: Pr
       {confirm && (
         <div className="fixed inset-0 z-50 grid place-items-center bg-ink/55 p-4">
           <div className="rounded-2xl border-2 border-ink bg-cream p-6 max-w-sm w-full shadow-[8px_8px_0_#17251f]">
-            <h2 className="text-xl font-bold mb-2">Delete prompt?</h2>
+            <h2 className="text-xl font-bold mb-2">Remove prompt?</h2>
             <p className="text-sm text-ink/70 mb-4">This action cannot be undone.</p>
             <div className="flex gap-2 justify-end">
               <button onClick={() => setConfirm(null)} className="chip">Cancel</button>
               <button onClick={() => remove(confirm)} className="rounded-full border-2 border-ink bg-coral px-4 py-2 text-xs font-black">
-                Delete
+                Remove prompt
               </button>
             </div>
           </div>
@@ -405,24 +421,6 @@ function Editor({
         </label>
 
         <label className="editor-label">
-          Tags <span className="normal-case tracking-normal text-ink/60">comma separated</span>
-          <input
-            className="editor-input normal-case tracking-normal"
-            value={value.tags?.join(", ") ?? ""}
-            onChange={(e) =>
-              set(
-                "tags",
-                e.target.value
-                  .split(",")
-                  .map((t) => t.trim())
-                  .filter(Boolean)
-              )
-            }
-            placeholder="writing, drafting, voice"
-          />
-        </label>
-
-        <label className="editor-label">
           Tools <span className="normal-case tracking-normal text-ink/60">comma separated</span>
           <input
             className="editor-input normal-case tracking-normal"
@@ -449,6 +447,7 @@ function Editor({
           >
             <option value="text">Text</option>
             <option value="image">Image</option>
+            <option value="video">Video</option>
           </select>
         </label>
 
