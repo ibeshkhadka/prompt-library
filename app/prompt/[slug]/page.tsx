@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { getPromptBySlug, getPublicPrompts } from "@/lib/prompts";
-import { ArrowLeft, Calendar, Tag, Wrench, FileText, Image, Sparkles, Star } from "lucide-react";
+import { ArrowLeft, Calendar, Wrench, FileText, Image, Sparkles, Star } from "lucide-react";
 import { CopyButton } from "@/components/CopyButton";
 import { LogoMark } from "@/components/logo-mark";
 
@@ -96,19 +96,6 @@ export default async function PromptDetailPage({ params }: { params: Promise<{ s
               <div className="flex flex-wrap gap-2">
                 {prompt.tools.map((tool) => (
                   <span key={tool} className="rounded-full border border-[var(--ink)] px-2 py-1 text-[10px] font-bold">{tool}</span>
-                ))}
-              </div>
-            </div>
-          )}
-          {prompt.tags && prompt.tags.length > 0 && (
-            <div className="bg-white rounded-xl border-2 border-[var(--ink)]/10 p-4">
-              <h3 className="text-sm font-semibold text-[var(--ink)]/60 uppercase tracking-wide mb-3 flex items-center gap-1">
-                <Tag size={14} />
-                Tags
-              </h3>
-              <div className="flex flex-wrap gap-2">
-                {prompt.tags.map((tag) => (
-                  <span key={tag} className="rounded-full border border-[var(--ink)]/20 px-2.5 py-1 text-sm text-[var(--ink)]/60">{tag}</span>
                 ))}
               </div>
             </div>

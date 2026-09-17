@@ -107,14 +107,7 @@ export function PromptDialog({ prompt, onClose }: { prompt: Prompt; onClose: () 
           <pre className="whitespace-pre-wrap font-sans text-sm leading-6">{prompt.content}</pre>
         </div>
 
-        <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-          <div className="flex flex-wrap gap-1.5">
-            {prompt.tags.map((tag) => (
-              <span key={tag} className="chip">
-                {tag}
-              </span>
-            ))}
-          </div>
+        <div className="mt-4 flex justify-end">
           <CopyButton content={prompt.content} />
         </div>
 

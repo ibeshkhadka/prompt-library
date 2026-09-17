@@ -12,7 +12,6 @@ const blank = (categories: Category[]): Partial<Prompt> => ({
   short_description: "",
   content: "",
   category: categories[0] ?? null,
-  tags: [],
   tools: [],
   prompt_type: "text",
   is_featured: false,
@@ -37,7 +36,7 @@ export function AdminStudio({ initialPrompts, categories, onSignOut }: { initial
   const filtered = useMemo(
     () =>
       prompts.filter((p) =>
-        `${p.title} ${p.short_description} ${p.tags.join(" ")}`
+        `${p.title} ${p.short_description}`
           .toLowerCase()
           .includes(query.toLowerCase())
       ),
@@ -54,7 +53,6 @@ export function AdminStudio({ initialPrompts, categories, onSignOut }: { initial
       short_description: selected.short_description ?? "",
       content: selected.content,
       category_id: selected.category?.id ?? null,
-      tags: selected.tags ?? [],
       tools: selected.tools ?? [],
       prompt_type: selected.prompt_type ?? "text",
       is_featured: selected.is_featured ?? false,
@@ -94,9 +92,9 @@ export function AdminStudio({ initialPrompts, categories, onSignOut }: { initial
   const exportData = (kind: "json" | "csv") => {
     const data =
       kind === "json"
-        ? JSON.stringify(prompts, null, 2)
+        ? JSON.stringify(prompts.map(({ tags: _tags, ...prompt }) => prompt), null, 2)
         : [
-            "title,slug,description,content,category,tags,tools,type,public",
+            "title,slug,description,content,category,tools,type,public",
             ...prompts.map((p) =>
               [
                 p.title,
@@ -104,7 +102,6 @@ export function AdminStudio({ initialPrompts, categories, onSignOut }: { initial
                 p.short_description,
                 p.content,
                 p.category?.slug,
-                p.tags.join("|"),
                 p.tools.join("|"),
                 p.prompt_type,
                 p.is_public,
@@ -145,10 +142,9 @@ export function AdminStudio({ initialPrompts, categories, onSignOut }: { initial
                 short_description: values[2],
                 content: values[3],
                 category: categories.find((c) => c.slug === values[4]) ?? null,
-                tags: values[5]?.split("|").filter(Boolean),
-                tools: values[6]?.split("|").filter(Boolean),
-                prompt_type: values[7] === "image" ? "image" : "text",
-                is_public: values[8] === "true",
+                tools: values[5]?.split("|").filter(Boolean),
+                prompt_type: values[6] === "image" ? "image" : values[6] === "video" ? "video" : "text",
+                is_public: values[7] === "true",
               };
             });
 
@@ -160,7 +156,6 @@ export function AdminStudio({ initialPrompts, categories, onSignOut }: { initial
           short_description: row.short_description ?? "",
           content: row.content,
           category_id: row.category?.id ?? defaults.category?.id ?? null,
-          tags: row.tags ?? defaults.tags,
           tools: row.tools ?? defaults.tools,
           prompt_type: row.prompt_type ?? defaults.prompt_type,
           is_featured: row.is_featured ?? defaults.is_featured,
@@ -422,24 +417,6 @@ function Editor({
             value={value.content ?? ""}
             onChange={(e) => set("content", e.target.value)}
             placeholder="You are an expert collaborator..."
-          />
-        </label>
-
-        <label className="editor-label">
-          Tags <span className="normal-case tracking-normal text-ink/60">comma separated</span>
-          <input
-            className="editor-input normal-case tracking-normal"
-            value={value.tags?.join(", ") ?? ""}
-            onChange={(e) =>
-              set(
-                "tags",
-                e.target.value
-                  .split(",")
-                  .map((t) => t.trim())
-                  .filter(Boolean)
-              )
-            }
-            placeholder="writing, drafting, voice"
           />
         </label>
 

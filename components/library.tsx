@@ -75,7 +75,7 @@ export function Library({ prompts: initialPrompts, categories: initialCategories
     try { localStorage.setItem("prompt-favorites", JSON.stringify(next)); } catch { /* Storage is optional. */ }
   }
   const results = useMemo(() => prompts.filter(p => {
-    const haystack = [p.title, p.short_description, p.content, p.category?.name, ...p.tags, ...p.tools].join(" ").toLowerCase();
+    const haystack = [p.title, p.short_description, p.content, p.category?.name, ...p.tools].join(" ").toLowerCase();
     return haystack.includes(search.trim().toLowerCase()) && (!category || p.category?.slug === category) && matchesFilter(p, filter, favorites);
   }), [prompts, search, category, filter, favorites]);
   const textCount = prompts.filter(p => p.prompt_type === "text").length;
