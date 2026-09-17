@@ -1,8 +1,10 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Download, Upload, Plus, Pencil, Trash2, Eye, Archive, X } from "lucide-react";
+import { Download, Upload, Plus, Pencil, Trash2, LogOut, X } from "lucide-react";
 import type { Category, Prompt } from "@/lib/types";
+import { createClient } from "@/lib/supabase/client";
+import { normalizePrompt } from "@/lib/normalize-prompt";
 
 const blank = (categories: Category[]): Partial<Prompt> => ({
   title: "",
@@ -23,7 +25,8 @@ function csvEscape(value: unknown) {
   return `"${String(value ?? "").replaceAll('"', '""')}"`;
 }
 
-export function AdminStudio({ initialPrompts, categories }: { initialPrompts: Prompt[]; categories: Category[] }) {
+export function AdminStudio({ initialPrompts, categories, onSignOut }: { initialPrompts: Prompt[]; categories: Category[]; onSignOut: () => void }) {
+  const supabase = useMemo(() => createClient(), []);
   const [prompts, setPrompts] = useState(initialPrompts);
   const [selected, setSelected] = useState<Partial<Prompt> | null>(null);
   const [query, setQuery] = useState("");
@@ -43,24 +46,29 @@ export function AdminStudio({ initialPrompts, categories }: { initialPrompts: Pr
 
   const save = async () => {
     if (!selected?.title || !selected.content) return setNotice("A title and full prompt are required.");
+    if (!supabase) return setNotice("The admin connection is not configured.");
     setSaving(true);
-    const payload = { ...selected, category_id: selected.category?.id ?? null };
-    const response = await fetch("/api/prompts", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-    const json = await response.json();
+    const payload = {
+      title: selected.title.trim(),
+      slug: (selected.slug || selected.title).trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, ""),
+      short_description: selected.short_description ?? "",
+      content: selected.content,
+      category_id: selected.category?.id ?? null,
+      tags: selected.tags ?? [],
+      tools: selected.tools ?? [],
+      prompt_type: selected.prompt_type ?? "text",
+      is_featured: selected.is_featured ?? false,
+      is_new: selected.is_new ?? false,
+      is_public: selected.is_public ?? false,
+      is_archived: selected.is_archived ?? false,
+    };
+    const result = selected.id
+      ? await supabase.from("prompts").update(payload).eq("id", selected.id).select("*, categories(*)").single()
+      : await supabase.from("prompts").insert(payload).select("*, categories(*)").single();
     setSaving(false);
-    if (!response.ok) return setNotice(json.error ?? "Could not save prompt.");
+    if (result.error || !result.data) return setNotice(result.error?.message ?? "Could not save prompt.");
 
-    const category = categories.find((c) => c.id === json.category_id) ?? selected.category ?? null;
-    const fresh = {
-      ...json,
-      category,
-      tags: json.tags ?? [],
-      tools: json.tools ?? [],
-    } as Prompt;
+    const fresh = normalizePrompt(result.data as Record<string, unknown>);
 
     setPrompts((items) =>
       selected.id
@@ -72,16 +80,13 @@ export function AdminStudio({ initialPrompts, categories }: { initialPrompts: Pr
   };
 
   const remove = async (id: string) => {
-    const response = await fetch("/api/prompts", {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id }),
-    });
-    if (response.ok) {
+    if (!supabase) return setNotice("The admin connection is not configured.");
+    const { error } = await supabase.from("prompts").delete().eq("id", id);
+    if (!error) {
       setPrompts((items) => items.filter((p) => p.id !== id));
-      setNotice("Prompt deleted.");
+      setNotice("Prompt removed from the library.");
     } else {
-      setNotice("Could not delete prompt.");
+      setNotice(error.message || "Could not remove prompt.");
     }
     setConfirm(null);
   };
@@ -118,6 +123,7 @@ export function AdminStudio({ initialPrompts, categories }: { initialPrompts: Pr
   };
 
   const importFile = async (file: File) => {
+    if (!supabase) return setNotice("The admin connection is not configured.");
     try {
       const text = await file.text();
       const rows: Partial<Prompt>[] = file.name.endsWith(".json")
@@ -147,16 +153,22 @@ export function AdminStudio({ initialPrompts, categories }: { initialPrompts: Pr
             });
 
       for (const row of rows) {
-        const res = await fetch("/api/prompts", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            ...blank(categories),
-            ...row,
-            category_id: row.category?.id ?? null,
-          }),
+        const defaults = blank(categories);
+        const { error } = await supabase.from("prompts").insert({
+          title: row.title,
+          slug: row.slug,
+          short_description: row.short_description ?? "",
+          content: row.content,
+          category_id: row.category?.id ?? defaults.category?.id ?? null,
+          tags: row.tags ?? defaults.tags,
+          tools: row.tools ?? defaults.tools,
+          prompt_type: row.prompt_type ?? defaults.prompt_type,
+          is_featured: row.is_featured ?? defaults.is_featured,
+          is_new: row.is_new ?? defaults.is_new,
+          is_public: row.is_public ?? defaults.is_public,
+          is_archived: row.is_archived ?? defaults.is_archived,
         });
-        if (!res.ok) throw new Error();
+        if (error) throw error;
       }
       location.reload();
     } catch {
@@ -187,6 +199,9 @@ export function AdminStudio({ initialPrompts, categories }: { initialPrompts: Pr
               onChange={(e) => e.target.files?.[0] && importFile(e.target.files[0])}
             />
           </label>
+          <button onClick={onSignOut} className="chip bg-paper">
+            <LogOut size={14} className="mr-1 inline" /> Sign out
+          </button>
           <button
             onClick={() => setSelected(blank(categories))}
             className="rounded-full border-2 border-ink bg-mint px-4 py-2 text-sm font-black"

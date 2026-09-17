@@ -4,6 +4,8 @@ import { useEffect, useMemo, useState } from "react";
 import { Search, X } from "lucide-react";
 import type { Category, Prompt } from "@/lib/types";
 import { PromptCard } from "@/components/prompt-card";
+import { createClient } from "@/lib/supabase/client";
+import { normalizePrompt } from "@/lib/normalize-prompt";
 
 export type Filter = "all" | "new" | "text" | "image" | "video" | "favorites";
 const PAGE_SIZE = 24;
@@ -13,9 +15,11 @@ const matchesFilter = (p: Prompt, filter: Filter, favorites: string[]) => filter
   (filter === "favorites" && favorites.includes(p.id)) ||
   (filter === "video" && p.prompt_type === "video");
 
-export function Library({ prompts, categories, initialSearch = "", initialFilter = "all", initialCategory = "" }: {
+export function Library({ prompts: initialPrompts, categories: initialCategories, initialSearch = "", initialFilter = "all", initialCategory = "" }: {
   prompts: Prompt[]; categories: Category[]; initialSearch?: string; initialFilter?: Filter; initialCategory?: string;
 }) {
+  const [prompts, setPrompts] = useState(initialPrompts);
+  const [categories, setCategories] = useState(initialCategories);
   const [search, setSearch] = useState(initialSearch);
   const [filter, setFilter] = useState<Filter>(FILTERS.some(([key]) => key === initialFilter) ? initialFilter : "all");
   const [category, setCategory] = useState(initialCategory);
@@ -28,6 +32,36 @@ export function Library({ prompts, categories, initialSearch = "", initialFilter
     if (FILTERS.some(([key]) => key === requestedFilter)) setFilter(requestedFilter as Filter);
     setCategory(params.get("category") || "");
     try { const saved: unknown = JSON.parse(localStorage.getItem("prompt-favorites") || "[]"); if (Array.isArray(saved)) setFavorites(saved.filter((id): id is string => typeof id === "string")); } catch { /* Storage is optional. */ }
+  }, []);
+  useEffect(() => {
+    const supabase = createClient();
+    if (!supabase) return;
+    const client = supabase;
+
+    let active = true;
+    async function loadLiveLibrary() {
+      const [promptResult, categoryResult] = await Promise.all([
+        client
+          .from("prompts")
+          .select("*, categories(*)")
+          .eq("is_public", true)
+          .eq("is_archived", false)
+          .order("sort_order")
+          .order("updated_at", { ascending: false }),
+        client.from("categories").select("*").order("name"),
+      ]);
+
+      if (!active) return;
+      if (!promptResult.error && promptResult.data) {
+        setPrompts(promptResult.data.map((row) => normalizePrompt(row as Record<string, unknown>)));
+      }
+      if (!categoryResult.error && categoryResult.data) {
+        setCategories(categoryResult.data as Category[]);
+      }
+    }
+
+    void loadLiveLibrary();
+    return () => { active = false; };
   }, []);
   function update(q: string, f: Filter, c: string) {
     setSearch(q); setFilter(f); setCategory(c); setVisible(PAGE_SIZE);
