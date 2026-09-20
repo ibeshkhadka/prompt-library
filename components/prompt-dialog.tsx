@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { X, Copy, Check } from "lucide-react";
 import type { Prompt } from "@/lib/types";
 
@@ -25,7 +26,7 @@ function CopyButton({ content }: { content: string }) {
   return (
     <button
       onClick={copy}
-      className="inline-flex items-center gap-2 rounded-full border-2 border-ink bg-mint px-4 py-2 text-xs font-black"
+      className="pink-button px-4 py-2 text-xs"
       aria-label="Copy prompt"
     >
       {copied ? (
@@ -43,25 +44,39 @@ function CopyButton({ content }: { content: string }) {
 
 export function PromptDialog({ prompt, onClose }: { prompt: Prompt; onClose: () => void }) {
   const closeRef = useRef<HTMLButtonElement>(null);
+  const dialogRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
+    const previousFocus = document.activeElement as HTMLElement | null;
+    const previousOverflow = document.body.style.overflow;
     closeRef.current?.focus();
-    const esc = (event: KeyboardEvent) => event.key === "Escape" && onClose();
+    const esc = (event: KeyboardEvent) => {
+      if (event.key === "Escape") onClose();
+      if (event.key === "Tab") {
+        const items = dialogRef.current?.querySelectorAll<HTMLElement>('button, a[href], input, select, textarea, [tabindex="0"]');
+        if (!items?.length) return;
+        const first = items[0], last = items[items.length - 1];
+        if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+        else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+      }
+    };
     document.addEventListener("keydown", esc);
     document.body.style.overflow = "hidden";
     return () => {
       document.removeEventListener("keydown", esc);
-      document.body.style.overflow = "";
+      document.body.style.overflow = previousOverflow;
+      previousFocus?.focus();
     };
   }, [onClose]);
 
-  return (
+  return createPortal(
     <div
       className="fixed inset-0 z-50 grid place-items-center bg-ink/55 p-4"
       role="presentation"
       onMouseDown={(e) => e.target === e.currentTarget && onClose()}
     >
       <section
+        ref={dialogRef}
         role="dialog"
         aria-modal="true"
         aria-labelledby="prompt-title"
@@ -92,14 +107,7 @@ export function PromptDialog({ prompt, onClose }: { prompt: Prompt; onClose: () 
           <pre className="whitespace-pre-wrap font-sans text-sm leading-6">{prompt.content}</pre>
         </div>
 
-        <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-          <div className="flex flex-wrap gap-1.5">
-            {prompt.tags.map((tag) => (
-              <span key={tag} className="chip">
-                #{tag}
-              </span>
-            ))}
-          </div>
+        <div className="mt-4 flex justify-end">
           <CopyButton content={prompt.content} />
         </div>
 
@@ -113,6 +121,7 @@ export function PromptDialog({ prompt, onClose }: { prompt: Prompt; onClose: () 
           · {prompt.tools.join(", ")}
         </p>
       </section>
-    </div>
+    </div>,
+    document.querySelector(".library-page") ?? document.body
   );
 }

@@ -1,33 +1,51 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { LogIn, Eye, EyeOff } from "lucide-react";
+import { Mail } from "lucide-react";
+import { LogoMark } from "@/components/logo-mark";
 
 export default function LoginPage() {
   const router = useRouter();
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [sent, setSent] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    if (!supabase) return;
+    void supabase.auth.getUser().then(({ data }) => {
+      if (data.user) router.replace("/admin");
+    });
+  }, [router, supabase]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError(null);
+    if (!supabase) {
+      setError("The admin connection is not configured.");
+      setIsLoading(false);
+      return;
+    }
 
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { error } = await supabase.auth.signInWithOtp({
+      email,
+      options: {
+        emailRedirectTo: `${window.location.origin}/prompt-library/admin/`,
+        shouldCreateUser: true,
+      },
+    });
     if (error) {
       setError(error.message);
       setIsLoading(false);
       return;
     }
 
-    router.push("/admin");
-    router.refresh();
+    setSent(true);
+    setIsLoading(false);
   };
 
   return (
@@ -35,10 +53,10 @@ export default function LoginPage() {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <div className="w-12 h-12 rounded-xl bg-[var(--ink)] flex items-center justify-center mx-auto mb-4">
-            <span className="text-[var(--mint)] text-xl font-bold">M</span>
+            <LogoMark size={36} />
           </div>
           <h1 className="text-2xl font-bold">Admin Login</h1>
-          <p className="text-[var(--ink)]/60 mt-2">Sign in to manage your prompt library</p>
+          <p className="text-[var(--ink)]/60 mt-2">Get a secure sign-in link to manage your prompts</p>
         </div>
 
         <div className="bg-white rounded-2xl border-2 border-[var(--ink)] shadow-[4px_4px_0_var(--ink)] p-6">
@@ -47,7 +65,14 @@ export default function LoginPage() {
               {error}
             </div>
           )}
-          <form onSubmit={handleSubmit} className="space-y-4">
+          {sent ? (
+            <div className="rounded-xl border-2 border-[var(--ink)] bg-[var(--mint)] p-4 text-center">
+              <Mail className="mx-auto mb-2" size={24} />
+              <p className="font-bold">Check your email</p>
+              <p className="mt-1 text-sm text-[var(--ink)]/70">Open the secure link we sent to {email}.</p>
+              <button onClick={() => setSent(false)} className="mt-3 text-sm font-bold underline">Use another email</button>
+            </div>
+          ) : <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label htmlFor="email" className="editor-label">Email</label>
               <input
@@ -61,42 +86,19 @@ export default function LoginPage() {
                 placeholder="you@example.com"
               />
             </div>
-            <div>
-              <label htmlFor="password" className="editor-label">Password</label>
-              <div className="relative">
-                <input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  autoComplete="current-password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="editor-input pr-10"
-                  placeholder="••••••••"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--ink)]/40 hover:text-[var(--ink)]"
-                  aria-label={showPassword ? "Hide password" : "Show password"}
-                >
-                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                </button>
-              </div>
-            </div>
             <button
               type="submit"
               disabled={isLoading}
               className="w-full inline-flex items-center justify-center gap-2 rounded-full border-2 border-[var(--ink)] bg-[var(--ink)] text-[var(--cream)] px-5 py-3 text-sm font-black hover:bg-[#2a3d35] transition-colors disabled:opacity-50"
             >
-              {isLoading ? "Signing in..." : (
+              {isLoading ? "Sending link..." : (
                 <>
-                  <LogIn size={18} />
-                  Sign in
+                  <Mail size={18} />
+                  Email me a sign-in link
                 </>
               )}
             </button>
-          </form>
+          </form>}
         </div>
 
         <p className="text-center text-sm text-[var(--ink)]/40 mt-6">
