@@ -60,13 +60,21 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 1. Create a new Supabase project at https://supabase.com
 2. Go to **SQL Editor** and run the migration:
    - `supabase/migrations/001_prompt_library.sql` — Creates tables, RLS policies, and seed categories
+   - `supabase/migrations/002_static_admin.sql` — Creates the private admin email allowlist
 3. Go to **SQL Editor** and run the seed:
    - `supabase/seed.sql` — Seeds 20 sample prompts
-4. Go to **Authentication → Users** and create your admin user
-5. Set the user's role to `admin` in the `profiles` table:
+4. Add the one email allowed to access the admin panel to `admin_allowlist`:
    ```sql
-   UPDATE profiles SET role = 'admin' WHERE email = 'your@email.com';
+   INSERT INTO public.admin_allowlist (email) VALUES (lower('you@example.com'));
    ```
+5. Create that user under **Authentication → Users**. If the Auth user already exists, set its profile role:
+   ```sql
+   UPDATE public.profiles p
+   SET role = 'admin'
+   FROM auth.users u
+   WHERE p.id = u.id AND lower(u.email) = lower('you@example.com');
+   ```
+6. Deploy `supabase/functions/admin-login` to the same Supabase project. Keep `verify_jwt` disabled for this function; it checks the private allowlist itself before requesting a sign-in link.
 
 ### 4. Run locally
 

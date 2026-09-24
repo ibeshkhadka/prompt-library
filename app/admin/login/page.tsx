@@ -31,15 +31,11 @@ export default function LoginPage() {
       return;
     }
 
-    const { error } = await supabase.auth.signInWithOtp({
-      email,
-      options: {
-        emailRedirectTo: `${window.location.origin}/prompt-library/admin/`,
-        shouldCreateUser: true,
-      },
+    const { error } = await supabase.functions.invoke("admin-login", {
+      body: { email: email.trim() },
     });
     if (error) {
-      setError(error.message);
+      setError("Could not request a sign-in link. Please try again.");
       setIsLoading(false);
       return;
     }
@@ -69,7 +65,7 @@ export default function LoginPage() {
             <div className="rounded-xl border-2 border-[var(--ink)] bg-[var(--mint)] p-4 text-center">
               <Mail className="mx-auto mb-2" size={24} />
               <p className="font-bold">Check your email</p>
-              <p className="mt-1 text-sm text-[var(--ink)]/70">Open the secure link we sent to {email}.</p>
+              <p className="mt-1 text-sm text-[var(--ink)]/70">If this address is approved for admin access, a secure sign-in link will arrive there.</p>
               <button onClick={() => setSent(false)} className="mt-3 text-sm font-bold underline">Use another email</button>
             </div>
           ) : <form onSubmit={handleSubmit} className="space-y-4">
